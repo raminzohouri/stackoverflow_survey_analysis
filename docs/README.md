@@ -1,4 +1,4 @@
-z##### Stackoverflow Survey 2020 Analysis
+##### Stackoverflow Survey 2020 Analysis
 # This will make you rethink what keeps developers satisfied at thier job
 A data based approach using Stack Overflow’s developer survey data from 2020.
 
