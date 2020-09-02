@@ -1,7 +1,7 @@
 theme: jekyll-theme-cayman
 lsi: false
 safe: true
-source: [https://github.com/raminzohouri/stackoverflow_survey_analysis]
+baseurl: /stackoverflow_survey_analysis
 incremental: false
 highlighter: rouge
 gist:
