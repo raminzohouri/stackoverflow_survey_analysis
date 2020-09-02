@@ -72,13 +72,13 @@ After all what keeps expert developer happy and keeps them in the company they a
 this question is not only salary and high payment but why and how developer are looking for new opportunities. What is 
 their demographic, education background what other parameter correlate with job satisfaction of the developer. 
 
-![alt_text](../data/jobhunt.png "")
+![alt_text](../data/jobhunt.png "Jub huntting reasons")
 
 Next to better compensation growth or leadership opportunities and being curious about other opportunities also are major
 reason why developers leave a company and look for new job. In comparison to year 2019 number of developer who actively 
 are looking for new positions has increased. Overall developer are passively looking for new opportunities.
 
-![alt_text](../data/jobhunt-1.png "")
+![alt_text](../data/jobhunt-1.png "Jub Huntting Caparison")
 
 ## Conclusion
 In this article focused on what keep developers in their job according to Stack Overflow 2019 and 2020 survey data.
