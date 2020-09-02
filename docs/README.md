@@ -37,11 +37,11 @@ Generally speaking we can gain knowledge about technological landscape and recen
 including Mobile and Web Apps, hardware programming, self-driving car, etc..., by looking at what trend developers are
 pursuing and how their choice of programming language, operation system, database have change during recent past few years.
 
-![alt text](../data/technology.png "Comparing technology trending between 2019 and 2020")
+![alt text](https://github.com/raminzohouri/stackoverflow_survey_analysis/raw/master/data/technology.png "Comparing technology trending between 2019 and 2020")
 
-![alt text](../data/programming-language.png "Comparing programming language trending between 2019 and 2020")
+![alt text](https://github.com/raminzohouri/stackoverflow_survey_analysis/raw/master/data/programming-language.png "Comparing programming language trending between 2019 and 2020")
 
-![alt text](../data/database.png "Comparing database trending between 2019 and 2020")
+![alt text](https://github.com/raminzohouri/stackoverflow_survey_analysis/raw/master/data/database.png "Comparing database trending between 2019 and 2020")
 
 On these tree graphs we compare the trends in Database, Programming Language, and Technology usage of developers from 
 year 2019 to the year 2020. Looking one year back we can gain some insight on that are new interests. 
@@ -57,12 +57,12 @@ For organizations its important to add well educated and expert developer into t
 and employment packages is one of the key players in highers such developers. based on graphic between year 2019 and 2020
 there was increase in the number of developers with 6 digit salaries.
 
-![alt text](../data/education-salary.png "Comparing salary developers with higher education between 2019 and 2020")
+![alt text](https://github.com/raminzohouri/stackoverflow_survey_analysis/raw/master/data/education-salary.png "Comparing salary developers with higher education between 2019 and 2020")
 
 On the level organization level it is hard to make judgment where the developer with higher education work. But based on the 
 graphic below most of the well educated developers in the year 2020 tend to work in middle size or smaller companies.
 
-![alt text](../data/orga-size.png "distribution of developers based their higher education and organization size")
+![alt text](https://github.com/raminzohouri/stackoverflow_survey_analysis/raw/master/data/orga-size.png "distribution of developers based their higher education and organization size")
 
 
 
@@ -72,13 +72,13 @@ After all what keeps expert developer happy and keeps them in the company they a
 this question is not only salary and high payment but why and how developer are looking for new opportunities. What is 
 their demographic, education background what other parameter correlate with job satisfaction of the developer. 
 
-![alt_text](../data/jobhunt.png "Jub huntting reasons")
+![alt_text](https://github.com/raminzohouri/stackoverflow_survey_analysis/raw/master/data/jobhunt.png "Jub huntting reasons")
 
 Next to better compensation growth or leadership opportunities and being curious about other opportunities also are major
 reason why developers leave a company and look for new job. In comparison to year 2019 number of developer who actively 
 are looking for new positions has increased. Overall developer are passively looking for new opportunities.
 
-![alt_text](../data/jobhunt-1.png "Jub Huntting Caparison")
+![alt_text](https://github.com/raminzohouri/stackoverflow_survey_analysis/raw/master/data/jobhunt-1.png "Jub Huntting Caparison")
 
 ## Conclusion
 In this article focused on what keep developers in their job according to Stack Overflow 2019 and 2020 survey data.
