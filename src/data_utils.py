@@ -4,6 +4,7 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import r2_score, mean_squared_error
+from sklearn.preprocessing import StandardScaler
 
 
 def get_multiple_choice_value_count(df, field_name, do_norm=False, set_index=False,
@@ -19,7 +20,34 @@ def get_multiple_choice_value_count(df, field_name, do_norm=False, set_index=Fal
     :return:
     '''
 
+    choice_count, is_numerical_field = get_choice_count(df, field_name, filter_condition)
+
+    choice_count = pd.DataFrame({'MultiLabels': list(choice_count.keys()), 'MultiValues': list(choice_count.values())})
+    if do_norm:
+        choice_count.MultiValues = choice_count.MultiValues.apply(lambda x: np.around(x / choice_count.shape[0], 3))
+
+    if show_plot:
+        choice_count.plot.bar(x='MultiLabels', y='MultiValues',
+                              title=''.join(['chosen values count for:', field_name]),
+                              figsize=(20, 10))
+    choice_count.rename(columns={'MultiLabels': field_name}, inplace=True)
+    choice_count.sort_values(by=field_name, inplace=True)
+    if set_index:
+        choice_count.set_index(field_name, inplace=True)
+
+    return choice_count
+
+
+def get_choice_count(df, field_name, filter_condition=None):
+    '''
+
+    :param df:
+    :param field_name:
+    :param filter_condition:
+    :return:
+    '''
     choice_count = {'nan': 0}
+    is_numerical_field = False
 
     def map_str(sl):
         if isinstance(sl, str):
@@ -41,24 +69,17 @@ def get_multiple_choice_value_count(df, field_name, do_norm=False, set_index=Fal
         dff = df[df[list(filter_condition.keys())[0]] == list(filter_condition.values())[0]]
     else:
         dff = df.copy()
-
     dff[field_name].apply(lambda x: map_str(x))
     if not choice_count['nan']:
         choice_count.pop('nan', None)
-    choice_count = pd.DataFrame({'MultiLabels': list(choice_count.keys()), 'MultiValues': list(choice_count.values())})
-    if do_norm:
-        choice_count.MultiValues = choice_count.MultiValues.apply(lambda x: np.around(x / dff.shape[0], 3))
 
-    if show_plot:
-        choice_count.plot.bar(x='MultiLabels', y='MultiValues',
-                              title=''.join(['chosen values count for:', field_name]),
-                              figsize=(20, 10))
-    choice_count.rename(columns={'MultiLabels': field_name}, inplace=True)
-    choice_count.sort_values(by=field_name, inplace=True)
-    if set_index:
-        choice_count.set_index(field_name, inplace=True)
-
-    return choice_count
+    for k in choice_count.keys():
+        try:
+            if np.isfinite(float(k)):
+                is_numerical_field = True
+        except:
+            continue
+    return choice_count, is_numerical_field
 
 
 def compare_multiple_choice_with_filter(df, filed_name, filter_field, filter_values=[None, None]):
@@ -119,24 +140,6 @@ def job_satisfaction(job_sat_level):
         return 0
 
 
-def categorize_value_in_range(df, filed_name, cat_number):
-    '''
-
-    :param df:
-    :param filed_name:
-    :param cat_number:
-    :return:
-    '''
-    mean_value = pd.to_numeric(df[filed_name], errors='coerce').mean()
-    filed_name_clean = ''.join([filed_name, 'Clean'])
-    df[filed_name_clean] = df[filed_name].apply(
-        lambda x: np.round(x) if np.isfinite(x) else mean_value)
-    cuts = pd.cut(df[filed_name_clean])
-    for c in cuts.categories:
-        df[filed_name_clean].apply(lambda x: np.round(c.mid) if c.left < x < c.right else x)
-    return df[filed_name_clean]
-
-
 def higher_ed(formal_ed_str):
     '''
     INPUT
@@ -166,31 +169,23 @@ def get_missing_row_percentage(df):
     :return:
     """
 
-    missing_rows = df.apply(lambda x: round(x.count() / df.shape[1], 2), axis=1)
+    missing_rows = df.isna().mean(axis=1)
     df['MissingRows'] = missing_rows
 
     return df
 
 
-def get_outliers(df, schema, missing_perc=0.15):
+def get_outliers(df, missing_perc=0.15):
     '''
      Perform an assessment of how much missing data there is in each column of the
      dataset.
     :param df:
-    :param schema:
     :params missing_perc:
     :return: dictionary of outliers columns and their percentage of missing value
     '''
-    outliers = {}
-
-    for k in schema['Column']:
-        nanpr = [y for x, y in df[k].value_counts(dropna=False, normalize=True).items() if str(x) == 'nan']
-        if not nanpr:
-            continue
-        if nanpr[0] < missing_perc:
-            continue
-        outliers[k] = nanpr[0]
-    return pd.DataFrame({'OutlierLabels': list(outliers.keys()), 'OutlierValues': list(outliers.values())})
+    outliers = df.isna().mean()
+    outliers = outliers[outliers > missing_perc]
+    return pd.DataFrame({'OutlierLabels': list(outliers.keys()), 'OutlierValues': list(outliers.values)})
 
 
 def get_description(schema, column_name):
@@ -234,20 +229,29 @@ def replace_nan_with_mean(x, mean_value):
         return np.round(mean_value)
 
 
-def categorize_values_in_range(df, filed_name, cat_number):
+def replace_special_str_with_number(df_field, special_strs={}):
     '''
-        replace missing values with mean of all values
-    :param df:
-    :param filed_name:
-    :param cat_number:
-    :param replace_nan:
+
+    :param df_field:
+    :param special_strs:
     :return:
     '''
-    mean_value = pd.to_numeric(df[filed_name], errors='coerce').mean()
-    filed_name_clean = ''.join([filed_name, 'Categorized'])
-    df[filed_name_clean] = df[filed_name].apply(lambda x: replace_nan_with_mean(x, mean_value))
-    cuts = pd.cut(df[filed_name_clean].array, cat_number)
-    return df[filed_name_clean].apply(lambda x: find_interval(cuts.categories, x)), filed_name_clean
+    return df_field.apply(lambda x: special_strs.get(x, x)).astype(np.float)
+
+
+def categorize_values_in_range(df_field, cat_number, impute_withmean=True):
+    '''
+        replace missing values with mean of all values
+    :param df_field:
+    :param cat_number:
+    :param impute_withmean
+    :return:
+    '''
+    if impute_withmean:
+        df_field = impute_with_mean(df_field)
+    filed_name_clean = ''.join([df_field.name, 'Categorized'])
+    cuts = pd.cut(df_field.array, cat_number)
+    return df_field.apply(lambda x: find_interval(cuts.categories, x)), filed_name_clean
 
 
 def coef_weights(coefficients, X_train):
@@ -270,27 +274,21 @@ def coef_weights(coefficients, X_train):
     return coefs_df
 
 
-def impute_with_mean(df, filed_name):
+def impute_with_mean(df_field):
     '''
 
-    :param df:
-    :param filed_name:
+    :param df_field:
     :return:
     '''
 
-    try:
-        col_mean = df[filed_name].mean()
-        new_df = df[filed_name].apply(lambda col: col.fillna(col_mean), axis=0)
-    except:
-        print('That broke...because column E is a string.')
-    return new_df
+    mean_value = pd.to_numeric(df_field, errors='coerce').mean()
+    return df_field.apply(lambda x: replace_nan_with_mean(x, mean_value))
 
 
-def create_dummy_df(df, dummy_na=True, cutoff_rate=0.2):
+def create_dummy_df(df, cutoff_rate=0.2):
     '''
     INPUT:
     :param: df - pandas dataframe with categorical variables you want to dummy
-    :param: dummy_na - Bool holding whether you want to dummy NA vals of categorical columns or not
     :param: cutoff_rate
 
     OUTPUT:
@@ -301,18 +299,22 @@ def create_dummy_df(df, dummy_na=True, cutoff_rate=0.2):
             4. if dummy_na is True - it also contains dummy columns for the NaN values
             5. Use a prefix of the column name with an underscore (_) for separating
     '''
+
     cat_cols = df.select_dtypes(include=['object']).columns
     for col in cat_cols:
-        try:
-            # for each cat add dummy var, drop original column
-            df = pd.concat([df.drop(col, axis=1),
-                            pd.get_dummies(df[col], prefix=col, prefix_sep='_', drop_first=True, dummy_na=dummy_na)],
-                           axis=1)
-        except:
-            continue
-    for c in df.columns:
-        if df[c].mean() < cutoff_rate:
-            df.drop(columns=[c], inplace=True)
+        choice_count, is_numerical_field = get_choice_count(df, col)
+        col_choices = [(col + '_' + k).replace(" ", "") for k in choice_count.keys()]
+        df[col_choices] = pd.DataFrame([np.zeros(len(choice_count.keys()))], index=df.index)
+        for i, j in df[col].items():
+            if isinstance(j, str):
+                for s in j.split(";"):
+                    df[(col + '_' + s).replace(" ", "")][i] = 1
+            else:
+                df[(col + '_' + str(j)).replace(" ", "")][i] = 1
+        for c in col_choices:
+            if df[c].mean() < cutoff_rate:
+                df.drop(columns=[c], inplace=True)
+        df.drop(col, axis=1, inplace=True)
     return df
 
 
@@ -353,7 +355,7 @@ def clean_and_split_data(df, response_col, include_cat_field=False, desired_colu
         df = df[desired_columns + [response_col]]
 
     if include_cat_field:
-        df = create_dummy_df(df, True, cutoff_rate)
+        df = create_dummy_df(df, cutoff_rate)
     else:
         df = drop_categorical_columns(df)
 
@@ -363,11 +365,36 @@ def clean_and_split_data(df, response_col, include_cat_field=False, desired_colu
     df = df.apply(fill_mean, axis=0)
 
     # Split into explanatory and response variables
+    return split_data_to_train_test(df, response_col, test_size, rand_state)
+
+
+def split_data_to_train_test(df, response_col, test_size=0.30, rand_state=42):
+    '''
+
+    :param df:
+    :param rand_state:
+    :param response_col:
+    :param test_size:
+    :return:
+    '''
     X = df.drop(response_col, axis=1)
     y = df[response_col]
     x_train, x_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=rand_state)
     # Split into train and test
     return X, y, x_train, x_test, y_train, y_test
+
+
+def apply_standard_scaler(x_train, x_test):
+    '''
+
+    :param x_train:
+    :param x_test:
+    :return:
+    '''
+    scaler = StandardScaler()
+    x_train = scaler.fit_transform(x_train)
+    x_test = scaler.transform(x_test)
+    return x_train, x_test
 
 
 def train_linear_model(x_train, y_train, x_test, y_test):
