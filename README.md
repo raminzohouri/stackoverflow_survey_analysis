@@ -20,7 +20,7 @@ Content
     * [Step by step CRIPS-DM for 2020 data](https://github.com/raminzohouri/stackoverflow_survey_analysis/blob/master/src/crisp-dm-steps.ipynb)
 
 * All the data is available under [data directory](https://github.com/raminzohouri/stackoverflow_survey_analysis/tree/master/data)
-    * survey results from year 2019 upload in zip format due limit file size of [githut](https://github.com)
+    * survey results from year 2019 upload in zip format due limit file size of [github](https://github.com)
     
 * Project report and source for blog post is available under [docs directory](https://github.com/raminzohouri/stackoverflow_survey_analysis/tree/master/docs)
 
