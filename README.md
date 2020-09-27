@@ -57,15 +57,6 @@ Useful Links
 * [scikit-learn](https://scikit-learn.org/stable/) - helps to find alternative machine learning solution
 * [pandas](https://pandas.pydata.org/) - helps to find more useful data analysis commands
 
-Contributing
-------------
-
-Please see [CONTRIBUTING.md](https://github.com/thoughtbot/factory_bot/blob/master/CONTRIBUTING.md).
-
-factory_bot was originally written by Joe Ferris and is maintained by thoughtbot.
-Many improvements and bugfixes were contributed by the [open source
-community](https://github.com/thoughtbot/factory_bot/graphs/contributors).
-
 License
 -------
 
